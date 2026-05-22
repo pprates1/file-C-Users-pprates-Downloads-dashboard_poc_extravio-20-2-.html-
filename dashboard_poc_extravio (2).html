@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard POC Extravio Forçado · Carrier</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f0efe9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:20px;color:#1a1a1a}
+.dash{max-width:960px;margin:0 auto;padding:0 0 2rem}
+
+/* TOPBAR */
+.topbar{background:#1a1a2e;border-radius:10px;padding:11px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.topbar-title{color:#f0c040;font-size:14px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.topbar-meta{display:flex;align-items:center;gap:10px}
+.badge-period{background:#2a2a4e;color:#8ab4f8;font-size:10px;padding:2px 8px;border-radius:99px;border:0.5px solid #3a3a6e}
+.topbar-date{font-size:11px;color:#8888aa}
+
+/* KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border:0.5px solid #ddddd8;border-radius:8px;padding:12px 14px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.kpi-tag{font-size:9px;font-weight:500;background:#E6F1FB;border-radius:4px;padding:1px 6px;display:inline-block;margin-bottom:4px;color:#185FA5}
+.kpi-label{font-size:10px;color:#999;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.kpi-val{font-size:22px;font-weight:500;line-height:1.1}
+.kpi-sub{font-size:10px;color:#666;margin-top:2px}
+.kpi-desc{font-size:10px;color:#999;margin-top:5px;padding-top:5px;border-top:0.5px solid #e8e8e3;line-height:1.45}
+.kpi.danger .kpi-val{color:#A32D2D}
+.kpi.warn   .kpi-val{color:#854F0B}
+.kpi.ok     .kpi-val{color:#0F6E56}
+
+/* SECTION HEADER */
+.sec-head{background:#1a1a2e;border-radius:8px;padding:8px 16px;margin-bottom:10px}
+.sec-head h3{color:#f0c040;font-size:13px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+
+/* TIMELINE */
+.tl-bar-wrap{position:relative;height:14px;margin:0 18px 8px}
+.tl-bar-bg{position:absolute;left:0;right:0;top:2px;height:10px;background:#1a3a5c;border-radius:5px}
+.tl-bar-fill{position:absolute;left:0;width:55%;top:2px;height:10px;background:#2980b9;border-radius:5px}
+.tl-stops{display:flex;justify-content:space-between;margin-bottom:10px}
+.tl-stop{display:flex;flex-direction:column;align-items:center;gap:2px}
+.tl-stop svg{width:36px;height:36px}
+.tl-date{font-size:10px;font-weight:500;color:#1a1a1a}
+.tl-ok{font-size:9px;color:#0F6E56}
+.tl-wip{font-size:9px;color:#854F0B}
+.tl-pend{font-size:9px;color:#aaa}
+
+/* CARDS */
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.card{background:#fff;border:0.5px solid #ddddd8;border-radius:8px;padding:11px 13px;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.card-title{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.card-title.green{color:#0F6E56} .card-title.amber{color:#854F0B} .card-title.blue{color:#185FA5}
+.step-list{list-style:none}
+.step-item{display:flex;align-items:flex-start;gap:7px;padding:4px 0;border-bottom:0.5px solid #e8e8e3;font-size:11.5px;color:#555;line-height:1.4}
+.step-item:last-child{border-bottom:none}
+.step-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.dot-ok{background:#1D9E75} .dot-wip{background:#BA7517} .dot-blue{background:#185FA5}
+.step-sub{font-size:10px;color:#aaa}
+.prazo{font-size:10px;color:#BA7517;font-weight:500}
+
+/* STAKEHOLDERS */
+.stk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stk-card{background:#fff;border:0.5px solid #ddddd8;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.stk-top-bar{height:6px}
+.stk-body{padding:11px 13px}
+.stk-meta{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
+.stk-info .stk-name{font-size:13px;font-weight:600;color:#1a1a1a}
+.stk-info .stk-role{font-size:10px;color:#999;margin-top:1px}
+.area-badge{display:inline-block;font-size:9px;font-weight:600;padding:2px 8px;border-radius:4px;margin-top:4px}
+.stk-divider{border:none;border-top:0.5px solid #e8e8e3;margin:7px 0}
+.stk-tasks{list-style:none}
+.stk-tasks li{display:flex;align-items:flex-start;gap:6px;font-size:11px;color:#555;padding:2px 0}
+.stk-tasks li::before{content:'•';font-size:12px;margin-top:-1px;flex-shrink:0}
+.stk-footer{display:flex;justify-content:flex-end;padding:4px 13px 8px}
+.prazo-tag{font-size:9px;font-weight:600;padding:2px 8px;border-radius:99px}
+
+/* RESPONSÁVEIS */
+.resp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.resp-card{background:#fff;border:0.5px solid #ddddd8;border-radius:8px;padding:11px 13px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.resp-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;background:#E6F1FB;color:#185FA5;border:1px solid #185FA5}
+.resp-info{flex:1}
+.resp-name{font-size:13px;font-weight:600;color:#1a1a1a}
+.resp-role{font-size:10px;color:#999;margin-top:1px}
+.resp-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.badge-status{font-size:9px;font-weight:600;padding:2px 8px;border-radius:99px}
+.badge-amber{background:#FAEEDA;color:#854F0B;border:0.5px solid #BA7517}
+.badge-blue {background:#E6F1FB;color:#185FA5;border:0.5px solid #185FA5}
+.resp-prazo{font-size:10px;font-weight:600;color:#854F0B}
+
+/* LM SECTION */
+.lm-header{display:flex;align-items:center;justify-content:space-between;border-left:5px solid #FFE600;padding-left:14px;margin-bottom:12px}
+.lm-title{font-size:18px;font-weight:600;color:#1a1a1a}
+.lm-badge{background:#FFE600;border:1px solid #C8A800;border-radius:6px;padding:3px 12px;font-size:11px;font-weight:700;color:#1a1a1a}
+.lm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.lm-card{background:#fff;border:0.5px solid #ddddd8;border-radius:8px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.lm-pill{background:#FFE600;border-bottom:1px solid #C8A800;padding:7px 10px;text-align:center;font-size:10px;font-weight:700;color:#1a1a1a;letter-spacing:.04em}
+.lm-body{padding:10px 12px;display:flex;gap:7px;align-items:flex-start}
+.lm-chevron{color:#FFE600;font-size:18px;font-weight:900;flex-shrink:0;line-height:1.2}
+.lm-desc{font-size:11.5px;color:#444;line-height:1.5}
+.lm-center{grid-column:2}
+hr.divider{border:none;border-top:0.5px solid #ddd;margin:14px 0}
+</style>
+</head>
+<body>
+<div class="dash">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-title">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f0c040" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      POC Extravio Forçado Comercial · Carrier
+    </div>
+    <div class="topbar-meta">
+      <span class="badge-period">Jan – Abr / 26</span>
+      <span class="topbar-date">Atualizado 20/05/26</span>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-row">
+    <div class="kpi danger">
+      <span class="kpi-tag">Jan – Abr / 26</span>
+      <div class="kpi-label">Impacto total</div>
+      <div class="kpi-val">USD 1,2M</div>
+      <div class="kpi-sub">vs. +USD 784K projetado</div>
+      <div class="kpi-desc">Superou em USD 416K o crescimento esperado. Após implementação, ratio de CC dobrou.</div>
+    </div>
+    <div class="kpi warn">
+      <span class="kpi-tag">Jan – Abr / 26</span>
+      <div class="kpi-label">Sem pedido de cancelamento</div>
+      <div class="kpi-val">54%</div>
+      <div class="kpi-sub">USD 638K lançados</div>
+      <div class="kpi-desc">Mais da metade dos extravios nunca teve reclamação formal aberta pelo cliente.</div>
+    </div>
+    <div class="kpi ok">
+      <span class="kpi-tag">Jan – Abr / 26</span>
+      <div class="kpi-label">Baixados pós-reclamação</div>
+      <div class="kpi-val">57%</div>
+      <div class="kpi-sub">USD 316K dos que pediram</div>
+      <div class="kpi-desc">Baixados logo após abertura da reclamação — indicando lançamento precipitado.</div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="sec-head"><h3>Timeline — Etapas POC</h3></div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="tl-bar-wrap"><div class="tl-bar-bg"></div><div class="tl-bar-fill"></div></div>
+    <div class="tl-stops">
+      <div class="tl-stop">
+        <svg viewBox="0 0 36 36" fill="none"><rect x="4" y="12" width="28" height="20" rx="3" fill="#FFE600" stroke="#C8A800" stroke-width="1"/><rect x="4" y="12" width="28" height="7" rx="2" fill="#FFC600" stroke="#C8A800" stroke-width="1"/><rect x="14" y="9" width="8" height="10" rx="2" fill="#C8A800" stroke="#a08000" stroke-width="0.8"/><rect x="2" y="17" width="32" height="3" rx="1" fill="#1a59a8" opacity="0.7"/><text x="18" y="27" text-anchor="middle" font-size="7" font-weight="700" fill="#1a3a6e" font-family="sans-serif">MELI</text></svg>
+        <div class="tl-date">20/05</div><div class="tl-ok">Concluído ✓</div>
+      </div>
+      <div class="tl-stop">
+        <svg viewBox="0 0 36 36" fill="none"><rect x="4" y="12" width="28" height="20" rx="3" fill="#FFE600" stroke="#C8A800" stroke-width="1"/><rect x="4" y="12" width="28" height="7" rx="2" fill="#FFC600" stroke="#C8A800" stroke-width="1"/><rect x="14" y="9" width="8" height="10" rx="2" fill="#C8A800" stroke="#a08000" stroke-width="0.8"/><rect x="2" y="17" width="32" height="3" rx="1" fill="#1a59a8" opacity="0.7"/><text x="18" y="27" text-anchor="middle" font-size="7" font-weight="700" fill="#1a3a6e" font-family="sans-serif">MELI</text></svg>
+        <div class="tl-date">27/05</div><div class="tl-wip">Em prazo ⚠</div>
+      </div>
+      <div class="tl-stop">
+        <svg viewBox="0 0 36 36" fill="none"><rect x="4" y="12" width="28" height="20" rx="3" fill="#e0e0e0" stroke="#b0b0b0" stroke-width="1"/><rect x="4" y="12" width="28" height="7" rx="2" fill="#d0d0d0" stroke="#b0b0b0" stroke-width="1"/><rect x="14" y="9" width="8" height="10" rx="2" fill="#b8b8b8" stroke="#999" stroke-width="0.8"/><rect x="2" y="17" width="32" height="3" rx="1" fill="#888" opacity="0.3"/><text x="18" y="27" text-anchor="middle" font-size="7" font-weight="700" fill="#888" font-family="sans-serif">MELI</text></svg>
+        <div class="tl-date">Em andamento</div><div class="tl-pend">Pendente</div>
+      </div>
+    </div>
+    <div class="row3" style="margin-bottom:0">
+      <div>
+        <div class="card-title green">✓ Concluído — 20/05</div>
+        <ul class="step-list">
+          <li class="step-item"><span class="step-dot dot-ok"></span><div><div>Agenda para definição de primeiros passos e responsabilidades</div><div class="step-sub">CCO / CC e LP · <span class="prazo">20/05</span></div></div></li>
+          <li class="step-item"><span class="step-dot dot-ok"></span><div><div>Estancar lançamento de extravio condicionando à reclamação aberta (comunicação com transportadoras)</div><div class="step-sub">Renata · <span class="prazo">20/05</span></div></div></li>
+        </ul>
+      </div>
+      <div>
+        <div class="card-title blue">⏱ Em andamento</div>
+        <ul class="step-list">
+          <li class="step-item"><span class="step-dot dot-blue"></span><div><div>Definir regra oficial de dias sem movimentação (prazos de diferimento)</div><div class="step-sub">Lucas e Thaise</div></div></li>
+          <li class="step-item"><span class="step-dot dot-blue"></span><div><div>Criar visibilidade do indicador NAT</div><div class="step-sub">Lucas e Thaise</div></div></li>
+          <li class="step-item"><span class="step-dot dot-blue"></span><div><div>Implementar NAT na gestão da rotina</div><div class="step-sub">Renata e time</div></div></li>
+          <li class="step-item"><span class="step-dot dot-blue"></span><div><div>Atualizar cláusulas contratuais</div><div class="step-sub">Renata e time</div></div></li>
+        </ul>
+      </div>
+      <div>
+        <div class="card-title amber">👥 Responsáveis</div>
+        <ul class="step-list">
+          <li class="step-item"><span class="step-dot dot-ok"></span><div><div>CCO / CC e LP</div><div class="step-sub"><span class="prazo">20/05 ✓</span></div></div></li>
+          <li class="step-item"><span class="step-dot dot-ok"></span><div><div>Renata</div><div class="step-sub"><span class="prazo">20/05 ✓</span></div></div></li>
+          <li class="step-item"><span class="step-dot dot-blue"></span><div><div>Lucas e Thaise</div><div class="step-sub">Em andamento</div></div></li>
+          <li class="step-item"><span class="step-dot dot-blue"></span><div><div>Renata e time</div><div class="step-sub">Em andamento</div></div></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAKEHOLDERS -->
+  <div class="sec-head"><h3>Stakeholders</h3></div>
+  <div class="stk-grid">
+    <div class="stk-card">
+      <div class="stk-top-bar" style="background:#854F0B"></div>
+      <div class="stk-body">
+        <div class="stk-meta">
+          <div class="avatar" style="background:#FAEEDA;color:#854F0B;border:1px solid #854F0B;">RE</div>
+          <div class="stk-info">
+            <div class="stk-name">Renata</div>
+            <div class="stk-role">Responsável Geral</div>
+            <span class="area-badge" style="background:#FAEEDA;color:#854F0B;border:0.5px solid #854F0B">CC / Operações</span>
+          </div>
+        </div>
+        <hr class="stk-divider">
+        <ul class="stk-tasks"><li style="color:#854F0B">Estancar lançamento de extravio condicionando à reclamação aberta</li><li style="color:#854F0B">RACI · Contratos</li><li style="color:#854F0B">NAT rotina · Cláusulas contratuais</li></ul>
+      </div>
+      <div class="stk-footer"><span class="prazo-tag" style="background:#FAEEDA;color:#854F0B;border:0.5px solid #854F0B">20/05</span></div>
+    </div>
+    <div class="stk-card">
+      <div class="stk-top-bar" style="background:#0F6E56"></div>
+      <div class="stk-body">
+        <div class="stk-meta">
+          <div class="avatar" style="background:#E1F5EE;color:#0F6E56;border:1px solid #0F6E56;">LU</div>
+          <div class="stk-info">
+            <div class="stk-name">Lucas</div>
+            <div class="stk-role">Analista de Dados</div>
+            <span class="area-badge" style="background:#E1F5EE;color:#0F6E56;border:0.5px solid #0F6E56">LP / Analytics</span>
+          </div>
+        </div>
+        <hr class="stk-divider">
+        <ul class="stk-tasks"><li style="color:#0F6E56">Definir regra oficial de dias sem movimentação</li><li style="color:#0F6E56">Criar visibilidade do indicador NAT</li></ul>
+      </div>
+      <div class="stk-footer"><span class="prazo-tag" style="background:#E1F5EE;color:#0F6E56;border:0.5px solid #0F6E56">Andamento</span></div>
+    </div>
+    <div class="stk-card">
+      <div class="stk-top-bar" style="background:#0F6E56"></div>
+      <div class="stk-body">
+        <div class="stk-meta">
+          <div class="avatar" style="background:#E1F5EE;color:#0F6E56;border:1px solid #0F6E56;">TH</div>
+          <div class="stk-info">
+            <div class="stk-name">Thaise</div>
+            <div class="stk-role">Analista de Dados</div>
+            <span class="area-badge" style="background:#E1F5EE;color:#0F6E56;border:0.5px solid #0F6E56">LP / Analytics</span>
+          </div>
+        </div>
+        <hr class="stk-divider">
+        <ul class="stk-tasks"><li style="color:#0F6E56">Definir regra oficial de dias sem movimentação</li><li style="color:#0F6E56">Criar visibilidade do indicador NAT</li></ul>
+      </div>
+      <div class="stk-footer"><span class="prazo-tag" style="background:#E1F5EE;color:#0F6E56;border:0.5px solid #0F6E56">Andamento</span></div>
+    </div>
+    <div class="stk-card">
+      <div class="stk-top-bar" style="background:#1a1a2e"></div>
+      <div class="stk-body">
+        <div class="stk-meta">
+          <div class="avatar" style="background:#E8E8F4;color:#1a1a2e;border:1px solid #1a1a2e;font-size:8px;">CCO</div>
+          <div class="stk-info">
+            <div class="stk-name">CCO / CC e LP</div>
+            <div class="stk-role">Comitê de Decisão</div>
+            <span class="area-badge" style="background:#E8E8F4;color:#1a1a2e;border:0.5px solid #1a1a2e">Diretoria</span>
+          </div>
+        </div>
+        <hr class="stk-divider">
+        <ul class="stk-tasks"><li style="color:#1a1a2e">Agenda para definição de primeiros passos</li><li style="color:#1a1a2e">Definição de responsabilidades</li></ul>
+      </div>
+      <div class="stk-footer"><span class="prazo-tag" style="background:#E1F5EE;color:#0F6E56;border:0.5px solid #0F6E56">Concluído</span></div>
+    </div>
+  </div>
+
+  <!-- DESCRIÇÕES DAS AÇÕES CC -->
+  <div class="sec-head"><h3>Descrições das Ações - CC</h3></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div style="font-size:13px;color:#555">Classificação operacional dos pacotes para tomada de decisão</div>
+    <div class="lm-badge">CCO MLB</div>
+  </div>
+  <div class="lm-grid">
+    <div class="lm-card">
+      <div class="lm-pill">PROCURAR PACOTE</div>
+      <div class="lm-body"><span class="lm-chevron">»</span><p class="lm-desc">Pacotes sem movimentação há mais de 48h e que não possuem pedido de cancelamento.</p></div>
+    </div>
+    <div class="lm-card">
+      <div class="lm-pill">POSSÍVEL BAIXA</div>
+      <div class="lm-body"><span class="lm-chevron">»</span><p class="lm-desc">Pacotes com pedido de cancelamento, sem movimentação há mais de 7 dias.</p></div>
+    </div>
+    <div class="lm-card">
+      <div class="lm-pill">SEGUIR COM A ENTREGA</div>
+      <div class="lm-body"><span class="lm-chevron">»</span><p class="lm-desc">Pacotes que possuem movimentação até 48h atrás e podem seguir normalmente para entrega ao buyer.</p></div>
+    </div>
+    <div class="lm-card">
+      <div class="lm-pill">ALTERAR PARA ENTREGUE</div>
+      <div class="lm-body"><span class="lm-chevron">»</span><p class="lm-desc">Pacotes que não possuem Pedido de cancelamento a mais de 30 dias.</p></div>
+    </div>
+    <div class="lm-card">
+      <div class="lm-pill">SEGUIR FLUXO DE DEVOLUÇÃO</div>
+      <div class="lm-body"><span class="lm-chevron">»</span><p class="lm-desc">Pacotes devolvidos offline (sem 2.0 e recebidos por outra operação), que geraram shp 2.0 e não finalizaram o processo, ou que precisam seguir o fluxo de devolução.</p></div>
+    </div>
+    <div class="lm-card">
+      <div class="lm-pill">RECEITA FEDERAL</div>
+      <div class="lm-body"><span class="lm-chevron">»</span><p class="lm-desc">Pacotes que tiveram a marcação de "awaiting tax documentation" e devem ser segregados para o fluxo da receita federal conforme a WI.</p></div>
+    </div>
+    <div class="lm-card lm-center">
+      <div class="lm-pill">SALVADOS</div>
+      <div class="lm-body"><span class="lm-chevron">»</span><p class="lm-desc">Pacotes que foram localizados fisicamente em salvados, seja ainda na operação ou em outra operação.</p></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
